@@ -13,18 +13,17 @@ const pixabayApiService = new PixabayApiService();
 
 searchForm.addEventListener('submit', onSearch);
 
-const lightbox = new SimpleLightbox('.gallery a', {
-  captionsData: 'alt',
-  captionDelay: 250,
-});
+const lightbox = new SimpleLightbox('.gallery a');
 
 function onSearch(event) {
   event.preventDefault();
 
   const searchQuery = event.target.elements.searchQuery.value;
+
   pixabayApiService.query = searchQuery;
 
   if (pixabayApiService.query === '') {
+    clearCardContainer();
     return;
   }
   pixabayApiService.resetPage();
@@ -45,14 +44,12 @@ async function fetchPhotos() {
     }
     const data = await pixabayApiService.fetchPhotos();
     if (data.hits.length === 0) {
-      iziToast.show({
+      return iziToast.show({
         message:
           'Sorry, there are no images matching your search query. Please try again.',
         color: 'red',
         position: 'topRight',
       });
-
-      return;
     } else {
       const page = pixabayApiService.getPage();
       if (page > 2) {
@@ -89,7 +86,11 @@ const options = {
 
 const callback = entries => {
   entries.forEach(entry => {
-    if (pixabayApiService.query !== '' && entry.isIntersecting) {
+    if (
+      pixabayApiService.query !== '' &&
+      entry.isIntersecting &&
+      pixabayApiService.getPage() > 1
+    ) {
       fetchPhotos();
     }
   });
