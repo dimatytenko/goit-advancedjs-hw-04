@@ -18,7 +18,7 @@ const lightbox = new SimpleLightbox('.gallery a');
 function onSearch(event) {
   event.preventDefault();
 
-  const searchQuery = event.target.elements.searchQuery.value;
+  const searchQuery = event.target.elements.searchQuery.value.trim();
 
   pixabayApiService.query = searchQuery;
 
@@ -52,7 +52,7 @@ async function fetchPhotos() {
       });
     } else {
       const page = pixabayApiService.getPage();
-      if (page > 2) {
+      if (page <= 2) {
         iziToast.show({
           message: `Hooray! We found ${data.totalHits} images.`,
           color: 'green',
